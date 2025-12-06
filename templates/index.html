@@ -94,28 +94,12 @@
     </div>
 
     <div id="dashboard-section" class="hidden">
-        <div class="section">
-            <h2>Dashboard</h2>
-            <p>Welcome, <span id="user-name"></span> (<span id="user-role"></span>)</p>
-            <button onclick="logout()">Logout</button>
-        </div>
-
-        <div id="doctor-controls" class="hidden section">
-            <h3>Doctor Controls</h3>
-            <p>Manage your availability here.</p>
-            <!-- Add availability controls if needed -->
-        </div>
-
-        <div id="patient-controls" class="hidden section">
-            <h3>Book Appointment</h3>
-            <select id="doctor-select">
-                <option value="">Select Doctor</option>
-            </select>
-            <input type="date" id="app-date">
-            <input type="time" id="app-time">
-            <button onclick="bookAppointment()">Book Appointment</button>
-            <p id="book-msg"></p>
-        </div>
+        </select>
+        <input type="date" id="app-date">
+        <input type="time" id="app-time">
+        <button onclick="bookAppointment()">Book Appointment</button>
+        <p id="book-msg"></p>
+    </div>
     </div>
 
     <script>
@@ -220,6 +204,31 @@
                 showMsg('book-msg', 'Appointment booked!');
             } else {
                 showMsg('book-msg', 'Failed to book', true);
+            }
+        }
+
+        async function addAvailability() {
+            const start = document.getElementById('avail-start').value;
+            const end = document.getElementById('avail-end').value;
+
+            if (!start || !end) {
+                showMsg('avail-msg', 'Please select both start and end times.', true);
+                return;
+            }
+
+            const res = await fetch(`${API_BASE}/doctor/availability/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ start_time: start, end_time: end })
+            });
+
+            if (res.ok) {
+                showMsg('avail-msg', 'Availability added!');
+            } else {
+                showMsg('avail-msg', 'Failed to add availability', true);
             }
         }
 
